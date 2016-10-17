@@ -3,7 +3,6 @@
 import email, getpass, imaplib, os, time ,subprocess
 import configFile
 
-continuar = False
 detach_dir = ""
 
 def get_timestamp():
@@ -102,7 +101,6 @@ def process_attachments():
             if(not drill):
                 drill = True
                 params.append("--drill="+mypath+"/"+archivo)
-            drill = archivo
             continue
 
     f = open(str(mypath)+'/salida.txt','w')
