@@ -14,6 +14,7 @@ Before first usage, configFile.py **must be modified.**
 
 ##Development
 
+(10/18/16) Fix bug where the location of pcb2gcode could not be established if running through Cron
 (10/17/16) Initial deployment
 
 ##Current status

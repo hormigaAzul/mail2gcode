@@ -19,3 +19,7 @@ message = ""
 signature = ""
 # Subject of the reply mail (optional)
 outbound_subject = ""
+
+## pcb2gcode settings
+# location of the program on the file system
+location = ''

@@ -83,7 +83,7 @@ def process_attachments():
     back = False
     drill = False
     edge = False
-    params = ['pcb2gcode', '--output-dir=./'+detach_dir, '--dpi=1000', '--metric=true', '--metricoutput=true', '--mirror-absolute=false', '--optimise=true', '--tile-x=1', '--tile-y=1', '--zchange=15.0000', '--zero-start=true', '--zsafe=5.0000', '--extra-passes=0', '--mill-feed=900', '--mill-speed=10000', '--offset=15.0000', '--zwork=-0.0100', '--drill-feed=1000', '--drill-side=back', '--drill-speed=10000', '--milldrill=false', '--nog81=false', '--onedrill=false', '--zdrill=-3.0000', '--bridges=2.0000', '--bridgesnum=2', '--cut-feed=450', '--cut-infeed=10.0000', '--cut-side=back', '--cut-speed=10000', '--cutter-diameter=3.0000', '--fill-outline=true', '--outline-width=0.2000', '--zbridges=-0.6000', '--zcut=-2.0000']
+    params = [configFile.location, '--output-dir=./'+detach_dir, '--dpi=1000', '--metric=true', '--metricoutput=true', '--mirror-absolute=false', '--optimise=true', '--tile-x=1', '--tile-y=1', '--zchange=15.0000', '--zero-start=true', '--zsafe=5.0000', '--extra-passes=0', '--mill-feed=900', '--mill-speed=10000', '--offset=15.0000', '--zwork=-0.0100', '--drill-feed=1000', '--drill-side=back', '--drill-speed=10000', '--milldrill=false', '--nog81=false', '--onedrill=false', '--zdrill=-3.0000', '--bridges=2.0000', '--bridgesnum=2', '--cut-feed=450', '--cut-infeed=10.0000', '--cut-side=back', '--cut-speed=10000', '--cutter-diameter=3.0000', '--fill-outline=true', '--outline-width=0.2000', '--zbridges=-0.6000', '--zcut=-2.0000']
 
     onlyfiles = [f for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
     for archivo in onlyfiles:
@@ -184,6 +184,8 @@ def check_config():
     if len(configFile.smtp_server)==0:
         return False
     if len(configFile.inbound_subject)==0:
+        return False
+    if len(configFile.location)==0:
         return False
     return True
 
