@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import email, getpass, imaplib, os, time ,subprocess
+import email, getpass, imaplib, os, time ,subprocess, re
 import configFile
 
 detach_dir = ""
@@ -78,6 +78,11 @@ def get_attachments(m, emailid):
 
 def process_attachments():
 
+    regex_back = re.compile("(.*B\.Cu\.gbr|.*\.btl|.*\.gbl)$")
+    regex_edge = re.compile("(.*Edge\.Cuts\.gbr|.*\.dm|.*\.gml|.*\.gm1)")
+    regex_front = re.compile("(.*F\.Cu\.gbr|.*\.gtl)")
+    regex_drill = re.compile("(.*\.drl|.*drill\.txt)")
+
     mypath = detach_dir
     front = False
     back = False
@@ -87,20 +92,25 @@ def process_attachments():
 
     onlyfiles = [f for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
     for archivo in onlyfiles:
-        if(("B.Cu" in archivo)or(".btl" in archivo)):
+        if(regex_back.match(archivo)):
             if(not back):
                 back = True
                 params.append("--back="+mypath+"/"+archivo)
             continue
-        if(("Edge.Cuts" in archivo)or(".dm" in archivo)or(".gml" in archivo)):
+        if(regex_edge.match(archivo)):
             if(not edge):
                 edge = True
                 params.append("--outline="+mypath+"/"+archivo)
             continue
-        if(".drl" in archivo):
+        if(regex_drill.match(archivo)):
             if(not drill):
                 drill = True
                 params.append("--drill="+mypath+"/"+archivo)
+            continue
+        if(regex_front.match(archivo)):
+            if(not front):
+                front = True
+                params.append("--front="+mypath+"/"+archivo)
             continue
 
     f = open(str(mypath)+'/salida.txt','w')
