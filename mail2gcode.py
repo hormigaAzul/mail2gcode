@@ -3,12 +3,13 @@
 import email, getpass, imaplib, os, time ,subprocess, re
 import configFile
 
-detach_dir = ""
+myfile = ""
+mypath = configFile.download_location
 
 def get_timestamp():
-    global detach_dir
+    global myfile
     timestamp = str(time.time())
-    detach_dir= timestamp[:timestamp.find('.')]
+    myfile= timestamp[:timestamp.find('.')]
 
 def check_mail():
     # connecting to the gmail imap server
@@ -24,20 +25,20 @@ def check_mail():
     return items, m
 
 def get_attachments(m, emailid):
-    if not os.path.exists(detach_dir):
-        os.mkdir(detach_dir)
+    if not os.path.exists(mypath):
+        os.mkdir(mypath)
     resp, data = m.fetch(emailid, "(RFC822)") # fetching the mail, "`(RFC822)`" means "get the whole stuff", but you can ask for headers only, etc
     email_body = data[0][1] # getting the mail content
     mail = email.message_from_bytes(email_body) # parsing the mail content to get a mail object
 
     #Check if any attachments at all
     if mail.get_content_maintype() != 'multipart':
-        os.rmdir(detach_dir)
+        os.rmdir(mypath)
         return ""
 
     if str(mail["Subject"]).strip() != configFile.inbound_subject:
         m.store(emailid, '-FLAGS','\\SEEN')
-        os.rmdir(detach_dir)
+        os.rmdir(mypath)
         return ""
 
     toaddrs = str(mail["From"])
@@ -65,7 +66,7 @@ def get_attachments(m, emailid):
             filename = 'part-%03d%s' % (counter, 'bin')
             counter += 1
 
-        att_path = os.path.join(detach_dir, filename)
+        att_path = os.path.join(mypath, filename)
 
         #Check if its already there
         if not os.path.isfile(att_path) :
@@ -83,12 +84,11 @@ def process_attachments():
     regex_front = re.compile("(.*F\.Cu\.gbr|.*\.gtl)")
     regex_drill = re.compile("(.*\.drl|.*drill\.txt)")
 
-    mypath = detach_dir
     front = False
     back = False
     drill = False
     edge = False
-    params = [configFile.location, '--output-dir=./'+detach_dir, '--dpi=1000', '--metric=true', '--metricoutput=true', '--mirror-absolute=false', '--optimise=true', '--tile-x=1', '--tile-y=1', '--zchange=15.0000', '--zero-start=true', '--zsafe=5.0000', '--extra-passes=0', '--mill-feed=900', '--mill-speed=10000', '--offset=15.0000', '--zwork=-0.0100', '--drill-feed=1000', '--drill-side=back', '--drill-speed=10000', '--milldrill=false', '--nog81=false', '--onedrill=false', '--zdrill=-3.0000', '--bridges=2.0000', '--bridgesnum=2', '--cut-feed=450', '--cut-infeed=10.0000', '--cut-side=back', '--cut-speed=10000', '--cutter-diameter=3.0000', '--fill-outline=true', '--outline-width=0.2000', '--zbridges=-0.6000', '--zcut=-2.0000']
+    params = [configFile.location, '--output-dir='+ mypath, '--dpi=1000', '--metric=true', '--metricoutput=true', '--mirror-absolute=false', '--optimise=true', '--tile-x=1', '--tile-y=1', '--zchange=15.0000', '--zero-start=true', '--zsafe=5.0000', '--extra-passes=0', '--mill-feed=900', '--mill-speed=10000', '--offset=15.0000', '--zwork=-0.0100', '--drill-feed=1000', '--drill-side=back', '--drill-speed=10000', '--milldrill=false', '--nog81=false', '--onedrill=false', '--zdrill=-3.0000', '--bridges=2.0000', '--bridgesnum=2', '--cut-feed=450', '--cut-infeed=10.0000', '--cut-side=back', '--cut-speed=10000', '--cutter-diameter=3.0000', '--fill-outline=true', '--outline-width=0.2000', '--zbridges=-0.6000', '--zcut=-2.0000']
 
     onlyfiles = [f for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
     for archivo in onlyfiles:
@@ -119,9 +119,8 @@ def process_attachments():
     f.close()
 
 def zip_files():
-    mypath = detach_dir
     zipping =["zip","-j"]
-    zipping.append(str(mypath)+"/"+str(mypath)+".zip")
+    zipping.append(str(mypath)+"/"+str(myfile)+".zip")
     onlyfiles = [f for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
     for archivo in onlyfiles:
         if ((".ngc" in archivo)or(".nc" in archivo)):
@@ -134,14 +133,14 @@ def send_mail_attachments(toaddrs):
     from email.mime.text import MIMEText
     from email.mime.base import MIMEBase
 
-    archivo = str(detach_dir)+"/"+str(detach_dir)+".zip"
+    archivo = str(mypath)+"/"+str(myfile)+".zip"
     fromaddr = configFile.user
     msg = MIMEMultipart()
     msg['Subject'] = configFile.outbound_subject
     msg['From'] = fromaddr
     msg['To'] = toaddrs
     texto = configFile.message
-    for linea in open(detach_dir+"/salida.txt",'r').readlines():
+    for linea in open(mypath+"/salida.txt",'r').readlines():
         texto = texto + linea
     texto = texto + configFile.signature
     texto = MIMEText(texto,'plain')
@@ -164,7 +163,7 @@ def disconnect(m):
     m.logout()
 
 def clean():
-    subprocess.call(["rm","-r",str(detach_dir)])
+    subprocess.call(["rm","-r",str(mypath)])
 
 def main():
     try:
@@ -199,6 +198,8 @@ def check_config():
         return False
     return True
 
+if not mypath[-1] =="/":
+    mypath += "/"
 if(check_config()):
     main()
 else:

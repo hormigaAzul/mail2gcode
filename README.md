@@ -14,6 +14,7 @@ Before first usage, configFile.py **must be modified.**
 
 ##Development
 
+(10/23/16) Add a location to put the downloaded attachments.
 (10/23/16) Filter input files by regular expressions.
 (10/18/16) Fix bug where the location of pcb2gcode could not be established if running through Cron
 (10/17/16) Initial deployment
@@ -26,7 +27,6 @@ Regular expressions have been implemented to allow easier customization of the i
 
 ##Future features
 
-- Define in config file the default location of the downloaded attachments.
 - Support for zipped files as input.
 - Parse pcb2gcode parameters from message body.
 - Create and import pcb2gcode default settings file.

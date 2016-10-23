@@ -23,3 +23,6 @@ outbound_subject = ""
 ## pcb2gcode settings
 # location of the program on the file system
 location = ''
+
+#location to which download attachments
+download_location = ''
