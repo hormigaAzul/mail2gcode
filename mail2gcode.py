@@ -7,9 +7,10 @@ myfile = ""
 mypath = configFile.download_location
 
 def get_timestamp():
-    global myfile
+    global myfile, mypath
     timestamp = str(time.time())
     myfile= timestamp[:timestamp.find('.')]
+    mypath = mypath + myfile + '/'
 
 def check_mail():
     # connecting to the gmail imap server
