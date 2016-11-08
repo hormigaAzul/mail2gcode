@@ -60,6 +60,8 @@ def get_attachments(m, emailid):
             continue
 
         filename = part.get_filename()
+        if email.header.decode_header(filename)[0][1] is not None:
+            filename = email.header.decode_header(filename)[0][0].decode(email.header.decode_header(filename)[0][1])
         counter = 1
 
         # if there is no filename, we create one with a counter to avoid duplicates
